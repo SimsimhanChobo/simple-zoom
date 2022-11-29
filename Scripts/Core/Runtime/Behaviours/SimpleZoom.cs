@@ -10,7 +10,7 @@ namespace DanielLochner.Assets.SimpleZoom
 {
     [AddComponentMenu("UI/Simple Zoom")]
     [RequireComponent(typeof(ScrollRect))]
-    public class SimpleZoom : MonoBehaviour, IPointerClickHandler
+    public class SimpleZoom : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
         #region Fields
         // Basic Settings
@@ -49,6 +49,7 @@ namespace DanielLochner.Assets.SimpleZoom
         private RectTransform zoomViewViewport;
         private ScrollRect scrollRect;
         private Canvas canvas;
+        private bool isPointer = false;
         #endregion
 
         #region Properties
@@ -273,8 +274,18 @@ namespace DanielLochner.Assets.SimpleZoom
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (taps == 0) doubleTapTime = doubleTapTargetTime;
-            if (Input.touchCount <= 1) taps++;
+            if (taps == 0)
+                doubleTapTime = doubleTapTargetTime;
+            if (Input.touchCount <= 1)
+                taps++;
+        }
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            isPointer = true;
+        }
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            isPointer = false;
         }
 
         private void Initialize()
@@ -353,7 +364,7 @@ namespace DanielLochner.Assets.SimpleZoom
         }
         private void OnHandheldUpdate()
         {
-            if (Input.touchCount >= 2)
+            if (Input.touchCount >= 2 && isPointer)
             {
                 #region Set Pivot
                 Vector2 pos1 = Input.touches[0].position;
@@ -426,7 +437,7 @@ namespace DanielLochner.Assets.SimpleZoom
         private void OnDesktopUpdate()
         {
             float scrollWheel = Input.GetAxis("Mouse ScrollWheel");
-            if (scrollWheel != 0)
+            if (scrollWheel != 0 && isPointer)
             {
                 #region Set Pivot
                 Vector2 inputPosition = Vector2.zero;
